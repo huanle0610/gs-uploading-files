@@ -53,20 +53,18 @@ class FileUploadIntegrationTests {
     @Test
     @Throws(Exception::class)
     fun shouldDownloadFile() {
-//        val filename = "testupload.txt"
-        val filename = "托尔斯泰.txt"
-        val resource = ClassPathResource(filename, javaClass)
-        given<Resource>(this.storageService.loadAsResource(filename)).willReturn(resource)
+        mapOf("testupload.txt" to "Spring Framework", "托尔斯泰.txt" to "精进").forEach { filename, content ->
+            val resource = ClassPathResource(filename, javaClass)
+            given<Resource>(this.storageService.loadAsResource(filename)).willReturn(resource)
 
-        val response = this.restTemplate
-                .getForEntity("/files/{filename}", String::class.java, filename)
+            val response = this.restTemplate
+                    .getForEntity("/files/{filename}", String::class.java, filename)
 
-        assertThat(response.statusCodeValue).isEqualTo(200)
-        assertThat(response.headers.getFirst(HttpHeaders.CONTENT_DISPOSITION))
-//                .isEqualTo("attachment; filename=\"$filename\"")
-                .isEqualTo(chineseFileDownloadHeaders(filename).getFirst(HttpHeaders.CONTENT_DISPOSITION))
-//        assertThat(response.body).isEqualTo("Spring Framework")
-        assertThat(response.body).isEqualTo("精进")
+            assertThat(response.statusCodeValue).isEqualTo(200)
+            assertThat(response.headers.getFirst(HttpHeaders.CONTENT_DISPOSITION))
+                    .isEqualTo(chineseFileDownloadHeaders(filename).getFirst(HttpHeaders.CONTENT_DISPOSITION))
+            assertThat(response.body).isEqualTo(content)
+        }
     }
 
 }
